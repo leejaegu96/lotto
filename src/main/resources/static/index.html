@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>로또 번호 생성기 🎰</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      margin-top: 80px;
+    }
+
+    h1 {
+      font-size: 2.2em;
+    }
+
+    select, button {
+      padding: 8px 14px;
+      font-size: 1em;
+      margin: 10px;
+    }
+
+    .numbers {
+      margin-top: 20px;
+    }
+
+    .set {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>로또 번호 생성기 🎰</h1>
+
+<label for="countSelect">몇 개 생성할까요?</label>
+<select id="countSelect">
+  <option value="1">1개</option>
+  <option value="2">2개</option>
+  <option value="3">3개</option>
+  <option value="4">4개</option>
+  <option value="5">5개</option>
+</select>
+
+<button id="generateBtn">로또 번호 생성</button>
+
+<div id="numbers" class="numbers"></div>
+
+<script>
+  document.getElementById("generateBtn").addEventListener("click", () => {
+    const count = parseInt(document.getElementById("countSelect").value);
+    const container = document.getElementById("numbers");
+    container.innerHTML = "";
+
+    for (let i = 0; i < count; i++) {
+      fetch("/api/lotto/random")
+              .then(response => {
+                if (!response.ok) throw new Error("서버 오류");
+                return response.json();
+              })
+              .then(data => {
+                const div = document.createElement("div");
+                div.className = "set";
+                div.textContent = Array.isArray(data)
+                        ? `🎲 ${data.join(" / ")}`
+                        : `⚠ 오류: ${JSON.stringify(data)}`;
+                container.appendChild(div);
+              })
+              .catch(err => {
+                const div = document.createElement("div");
+                div.className = "set";
+                div.textContent = `⚠ 요청 실패: ${err.message}`;
+                container.appendChild(div);
+              });
+    }
+  });
+</script>
+
+</body>
+</html>
